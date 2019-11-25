@@ -1,0 +1,39 @@
+{
+  "name": "nextjs-electron-ts",
+  "productName": "ElectronNext",
+  "version": "1.0.0",
+  "main": "main/out/index.js",
+  "scripts": {
+    "build-main": "tsc -p main",
+    "start-all": "npm run build-main && electron .",
+    "build": "npm run build-main && next build renderer && next export renderer",
+    "dist": "npm run build && electron-builder --dir",
+    "start": "nodemon --watch ./main --ext ts --exec \"npm run start-all\""
+  },
+  "build": {
+    "asar": false,
+    "extraResources": [
+      {
+        "from": "renderer/out",
+        "to": "app/renderer"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.9",
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.4",
+    "concurrently": "^5.0.0",
+    "electron": "^6.0.2",
+    "electron-builder": "^21.2.0",
+    "next": "latest",
+    "nodemon": "^2.0.1",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "electron-is-dev": "^1.0.1",
+    "electron-next": "^3.1.5"
+  }
+}
