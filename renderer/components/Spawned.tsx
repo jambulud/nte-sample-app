@@ -1,12 +1,10 @@
-import { Component, ChangeEvent, MouseEvent, FormEvent } from 'react'
-import Layout from './Layout';
+import { Component, ChangeEvent, MouseEvent, FormEvent, Fragment } from 'react'
+
 
 interface CustomProps {
-    handleSpawnMessage: (event: MouseEvent) => void,
-    handleChange: (event: ChangeEvent) => void,
-    handleSubmit: (event: FormEvent) => void,
+    handleInfo: (event: MouseEvent) => void,
     message: string,
-    spawnMessage: string,
+    command: string,
 }
 
 class DisplayRes extends Component<CustomProps>{
@@ -15,29 +13,45 @@ class DisplayRes extends Component<CustomProps>{
         super(props);
     }
 
+    directoryInfo() {
+        if (this.props.message) {
+            return (
+                <Fragment>
+                    <h3>Directory info:</h3>
+                    <p>
+                        <pre>{this.props.message}</pre>
+                    </p>
+                </Fragment>
+            )
+        }
+
+        return null;
+    }
+
 
     render() {
 
         return (
-            <Layout>
-                <h1>Hello Electron!</h1>
+            <Fragment>
+                <div className="directory-info">
+                    <button onClick={this.props.handleInfo}>Execute <strong>{this.props.command}</strong></button>
+                    {this.directoryInfo()}
+                </div>
 
-                <button onClick={this.props.handleSpawnMessage}>Spawn ls</button>
-
-                {this.props.message && <p>{this.props.message}</p>}
-
-                Spawn message: <br />{this.props.spawnMessage}
-
-                <form onSubmit={this.props.handleSubmit}>
-                    <input type="text" onChange={this.props.handleChange} />
-                </form>
                 <style jsx>{`
-            h1 {
-              color: green;
-              font-size: 50px;
-            }
-          `}</style>
-            </Layout>
+                    h1 {
+                    color: green;
+                    font-size: 50px;
+                    }
+
+                    .directory-info {
+                        padding: 16px;
+                        border: solid 2px gray;
+                        
+                    }
+                `}
+                </style>
+            </Fragment>
         )
     }
 }

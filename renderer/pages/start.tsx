@@ -1,13 +1,15 @@
-import { Component } from 'react'
+import { Component, Fragment } from 'react'
 import { IpcRendererEvent } from 'electron';
 import Spawned from '../components/Spawned';
 import Renderer from '../services/renderer.service';
+import Layout from '../components/Layout';
 
 class HelloElectron extends Component {
   state = {
     input: '',
-    message: null,
-    spawnMessage: null,
+    mkdirMessage: null,
+    lsMessage: null,
+    pwdMessage: null,
   }
 
   renderer: Renderer;
@@ -19,48 +21,61 @@ class HelloElectron extends Component {
 
   componentDidMount() {
     // start listening the channel message
-    this.renderer.on('message', this.handleMessage)
-    this.renderer.on('terminal:spawn-ls', this.handleSpawnMessage);
+    this.renderer.on('terminal/mkdir', this.handleMkdir)
+    this.renderer.on('terminal/ls', this.handleLs);
+    this.renderer.on('terminal/pwd', this.handlePwd);
   }
 
   componentWillUnmount() {
-    // stop listening the channel message
+    // stop listening channel messages
     this.renderer.removeAll();
   }
 
-  handleMessage = (_: IpcRendererEvent, message: string) => {
+  handleMkdir = (_: IpcRendererEvent, message: string) => {
     // receive a message from the main process and save it in the local state
-    this.setState({ message })
+    this.setState({ mkdirMessage: message })
   }
 
-  handleSpawnMessage = (_: IpcRendererEvent, spawnMessage: string) => {
-    // receive a message from the main process and save it in the local state
-    this.setState({ spawnMessage })
+  handleLs = (_: IpcRendererEvent, message: string) => {
+    this.setState({ lsMessage: message })
   }
 
-  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ input: event.target.value })
+  handlePwd = (_: IpcRendererEvent, message: string) => {
+    this.setState({ pwdMessage: message })
   }
 
-  handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    this.renderer.send('message', this.state.input)
-    this.setState({ message: null })
+  handleSendLs = () => {
+    this.renderer.send('terminal/ls', this.state.input)
   }
 
-  handleSpawn = () => {
-    this.renderer.send('terminal:spawn-ls', this.state.input)
+  handleSendMkdir = () => {
+    this.renderer.send('terminal/mkdir', this.state.input)
+  }
+
+  handleSendPwd = () => {
+    this.renderer.send('terminal/pwd', this.state.input)
   }
 
   render() {
     return (
-      <Spawned
-        message={this.state.message}
-        spawnMessage={this.state.spawnMessage}
-        handleSpawnMessage={this.handleSpawn}
-        handleSubmit={this.handleSubmit}
-        handleChange={this.handleChange}>
-      </Spawned>
+      <Layout>
+        <h1>Hello Electron!</h1>
+        <Spawned
+          message={this.state.lsMessage}
+          command="ls"
+          handleInfo={this.handleSendLs}>
+        </Spawned>
+        <Spawned
+          message={this.state.mkdirMessage}
+          command="mkdir"
+          handleInfo={this.handleSendMkdir}>
+        </Spawned>
+        <Spawned
+          message={this.state.pwdMessage}
+          command="pwd"
+          handleInfo={this.handleSendPwd}>
+        </Spawned>
+      </Layout>
     );
   }
 }

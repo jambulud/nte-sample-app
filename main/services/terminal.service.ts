@@ -1,23 +1,70 @@
 import { WebContents } from 'electron';
 import { spawn } from 'child_process';
 
-
-export default (sender: WebContents, message: string) => {
-    const ls = spawn('ls', ['-lh', '/usr']);
-
-    ls.stdout.on('data', (data) => {
-        const resMessage = `stdout: ${data}`;
-        console.log(resMessage);
-        sender.send('terminal:spawn-ls', resMessage)
-    });
-
-    ls.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-    });
-
-    ls.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
+interface Command {
+    command: string,
+    arguments: string[],
 }
 
+export const CMD_LS: Command = { command: 'ls', arguments: ['-lh'] };
 
+export const CMD_MKDIR: Command = { command: 'mkdir', arguments: ['hellodir'] };
+
+export const CMD_PWD: Command = { command: 'pwd', arguments: [] };
+
+
+export class TerminalService {
+
+    ls(channel: string, sender: WebContents) {
+        const ls = spawn(CMD_LS.command, CMD_LS.arguments)
+
+        ls.stdout.on('data', (data) => {
+            const message = `stdout: \n${data}`;
+            sender.send(channel, message)
+        });
+
+        ls.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+
+        ls.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+        });
+    }
+
+    mkdir(channel: string, sender: WebContents, dirname: string) {
+        const mkdir = spawn(CMD_MKDIR.command, CMD_MKDIR.arguments);
+
+        mkdir.stdout.on('data', (data) => {
+            const message = `stdout: \n${data}`;
+            sender.send(channel, message)
+        });
+
+        mkdir.stderr.on('data', (data) => {
+            const message = `stderr: \n${data}`;
+            sender.send(channel, message)
+        });
+
+        mkdir.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+        });
+    }
+
+    pwd(channel: string, sender: WebContents) {
+        const pwd = spawn(CMD_PWD.command, CMD_PWD.arguments);
+
+        pwd.stdout.on('data', (data) => {
+            const message = `stdout: \n${data}`;
+            sender.send(channel, message)
+        });
+
+        pwd.stderr.on('data', (data) => {
+            const message = `stderr: \n${data}`;
+            sender.send(channel, message)
+        });
+
+        pwd.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+        });
+    }
+}

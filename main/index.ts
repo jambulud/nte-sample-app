@@ -8,7 +8,9 @@ import isDev from 'electron-is-dev';
 import prepareNext from 'electron-next';
 
 // Other dependencies
-import spawnLs from './services/terminal.service';
+import { TerminalService } from './services/terminal.service';
+
+const terminalService = new TerminalService();
 
 // Prepare the renderer once the app is ready
 app.on('ready', async () => {
@@ -42,7 +44,24 @@ ipcMain.on('message', (event, message) => {
   event.sender.send('message', message)
 })
 
-ipcMain.on('terminal:spawn-ls', (event, message) => {
-  spawnLs(event.sender, message);
+function endpoint(path: string) { // this is the decorator factory
+  return function (target) { // this is the decorator
+      // do something with 'target' and 'value'...
+  }
+}
+
+ipcMain.on('terminal/ls', (event, _) => {
+  terminalService.ls('terminal/ls', event.sender);
+  console.log('spawned!!')
+});
+
+ipcMain.on('terminal/mkdir', (event, dirname) => {
+  terminalService.mkdir('terminal/mkdir', event.sender, dirname);
+  console.log('spawned!!')
+});
+
+
+ipcMain.on('terminal/pwd', (event, dirname) => {
+  terminalService.pwd('terminal/pwd', event.sender);
   console.log('spawned!!')
 });
