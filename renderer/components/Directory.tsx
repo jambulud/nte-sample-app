@@ -1,13 +1,14 @@
-import { Component, MouseEvent, Fragment } from 'react'
+import { Component, ChangeEvent, MouseEvent, Fragment } from 'react'
 
 
 interface CustomProps {
     handleInfo: (event: MouseEvent) => void,
+    handleInput: (event: ChangeEvent) => void,
     message: string,
     command: string,
 }
 
-class Spawned extends Component<CustomProps>{
+class Directory extends Component<CustomProps>{
 
     constructor(props: CustomProps) {
         super(props);
@@ -24,7 +25,6 @@ class Spawned extends Component<CustomProps>{
                 </Fragment>
             )
         }
-
         return null;
     }
 
@@ -32,8 +32,15 @@ class Spawned extends Component<CustomProps>{
         return (
             <Fragment>
                 <div className="directory-info">
-                    <button onClick={this.props.handleInfo}>Execute <strong>{this.props.command}</strong></button>
+                    <button
+                        onClick={this.props.handleInfo}
+                    >Execute <strong>{this.props.command}</strong>
+                    </button>
+                    <input
+                        onChange={this.props.handleInput}
+                        placeholder="Introduce dir name" />
                     {this.directoryInfo()}
+
                 </div>
 
                 <style jsx>{`
@@ -54,4 +61,4 @@ class Spawned extends Component<CustomProps>{
     }
 }
 
-export default Spawned;
+export default Directory;

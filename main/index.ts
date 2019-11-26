@@ -52,16 +52,16 @@ function endpoint(path: string) { // this is the decorator factory
 
 ipcMain.on('terminal/ls', (event, _) => {
   terminalService.ls('terminal/ls', event.sender);
-  console.log('spawned!!')
 });
 
 ipcMain.on('terminal/mkdir', (event, dirname) => {
   terminalService.mkdir('terminal/mkdir', event.sender, dirname);
-  console.log('spawned!!')
 });
 
+ipcMain.on('terminal/rmdir', (event, dirname) => {
+  terminalService.rmdir('terminal/rmdir', event.sender, dirname);
+});
 
-ipcMain.on('terminal/pwd', (event, dirname) => {
+ipcMain.on('terminal/pwd', (event, _) => {
   terminalService.pwd('terminal/pwd', event.sender);
-  console.log('spawned!!')
 });

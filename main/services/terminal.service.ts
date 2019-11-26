@@ -8,10 +8,11 @@ interface Command {
 
 export const CMD_LS: Command = { command: 'ls', arguments: ['-lh'] };
 
-export const CMD_MKDIR: Command = { command: 'mkdir', arguments: ['hellodir'] };
+export const CMD_MKDIR: Command = { command: 'mkdir', arguments: [] };
+
+export const CMD_RMDIR: Command = { command: 'rmdir', arguments: [] };
 
 export const CMD_PWD: Command = { command: 'pwd', arguments: [] };
-
 
 export class TerminalService {
 
@@ -33,7 +34,7 @@ export class TerminalService {
     }
 
     mkdir(channel: string, sender: WebContents, dirname: string) {
-        const mkdir = spawn(CMD_MKDIR.command, CMD_MKDIR.arguments);
+        const mkdir = spawn(CMD_MKDIR.command, [dirname]);
 
         mkdir.stdout.on('data', (data) => {
             const message = `stdout: \n${data}`;
@@ -46,6 +47,24 @@ export class TerminalService {
         });
 
         mkdir.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+        });
+    }
+
+    rmdir(channel: string, sender: WebContents, dirname: string) {
+        const rmdir = spawn(CMD_RMDIR.command, [dirname]);
+
+        rmdir.stdout.on('data', (data) => {
+            const message = `stdout: \n${data}`;
+            sender.send(channel, message)
+        });
+
+        rmdir.stderr.on('data', (data) => {
+            const message = `stderr: \n${data}`;
+            sender.send(channel, message)
+        });
+
+        rmdir.on('close', (code) => {
             console.log(`child process exited with code ${code}`);
         });
     }
