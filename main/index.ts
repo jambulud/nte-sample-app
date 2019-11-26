@@ -39,29 +39,7 @@ app.on('ready', async () => {
 // Quit the app once all windows are closed
 app.on('window-all-closed', app.quit);
 
-// listen the channel `message` and resend the received message to the renderer process
-ipcMain.on('message', (event, message) => {
-  event.sender.send('message', message)
-})
-
-function endpoint(path: string) { // this is the decorator factory
-  return function (target) { // this is the decorator
-      // do something with 'target' and 'value'...
-  }
-}
-
-ipcMain.on('terminal/ls', (event, _) => {
-  terminalService.ls('terminal/ls', event.sender);
-});
-
-ipcMain.on('terminal/mkdir', (event, dirname) => {
-  terminalService.mkdir('terminal/mkdir', event.sender, dirname);
-});
-
-ipcMain.on('terminal/rmdir', (event, dirname) => {
-  terminalService.rmdir('terminal/rmdir', event.sender, dirname);
-});
-
-ipcMain.on('terminal/pwd', (event, _) => {
-  terminalService.pwd('terminal/pwd', event.sender);
-});
+terminalService.ls();
+terminalService.mkdir(null);
+terminalService.rmdir(null);
+terminalService.pwd();

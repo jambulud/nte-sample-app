@@ -1,5 +1,6 @@
 import { WebContents } from 'electron';
-import { spawn } from 'child_process';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+import Process from '../decorators/process';
 
 interface Command {
     command: string,
@@ -16,74 +17,43 @@ export const CMD_PWD: Command = { command: 'pwd', arguments: [] };
 
 export class TerminalService {
 
-    ls(channel: string, sender: WebContents) {
+    private standardHandler(spawn: ChildProcessWithoutNullStreams): Promise<{}> {
+        return new Promise((resolve, reject) => {
+            spawn.stdout.on('data', data => resolve(`stdout: ${data}`));
+            spawn.stderr.on('data', data => reject(`stderr: ${data}`));
+            spawn.on('close', code => resolve(`child process exited with code ${code}`));
+        });
+    }
+
+    @Process('terminal/ls')
+    async ls() {
         const ls = spawn(CMD_LS.command, CMD_LS.arguments)
+        const result = await this.standardHandler(ls);
 
-        ls.stdout.on('data', (data) => {
-            const message = `stdout: \n${data}`;
-            sender.send(channel, message)
-        });
-
-        ls.stderr.on('data', (data) => {
-            console.error(`stderr: ${data}`);
-        });
-
-        ls.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-        });
+        return result;
     }
 
-    mkdir(channel: string, sender: WebContents, dirname: string) {
+    @Process('terminal/mkdir')
+    async mkdir(dirname: string) {
         const mkdir = spawn(CMD_MKDIR.command, [dirname]);
+        const result = await this.standardHandler(mkdir);
 
-        mkdir.stdout.on('data', (data) => {
-            const message = `stdout: \n${data}`;
-            sender.send(channel, message)
-        });
-
-        mkdir.stderr.on('data', (data) => {
-            const message = `stderr: \n${data}`;
-            sender.send(channel, message)
-        });
-
-        mkdir.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-        });
+        return result;
     }
 
-    rmdir(channel: string, sender: WebContents, dirname: string) {
+    @Process('terminal/rmdir')
+    async rmdir(dirname: string) {
         const rmdir = spawn(CMD_RMDIR.command, [dirname]);
+        const result = await this.standardHandler(rmdir);
 
-        rmdir.stdout.on('data', (data) => {
-            const message = `stdout: \n${data}`;
-            sender.send(channel, message)
-        });
-
-        rmdir.stderr.on('data', (data) => {
-            const message = `stderr: \n${data}`;
-            sender.send(channel, message)
-        });
-
-        rmdir.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-        });
+        return result;
     }
 
-    pwd(channel: string, sender: WebContents) {
+    @Process('terminal/pwd')
+    async pwd() {
         const pwd = spawn(CMD_PWD.command, CMD_PWD.arguments);
+        const result = await this.standardHandler(pwd);
 
-        pwd.stdout.on('data', (data) => {
-            const message = `stdout: \n${data}`;
-            sender.send(channel, message)
-        });
-
-        pwd.stderr.on('data', (data) => {
-            const message = `stderr: \n${data}`;
-            sender.send(channel, message)
-        });
-
-        pwd.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-        });
+        return result;
     }
 }
