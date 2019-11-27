@@ -17,6 +17,8 @@ export const CMD_PWD: Command = { command: 'pwd', arguments: [] };
 
 export const POWERSHELL: Command = { command: 'cmd.exe', arguments: ['mvn', '--help'] };
 
+const MAX_BUFFER = 1024 * 500; /* 500 KB */
+
 export class TerminalService {
 
     private standardHandler(spawn: ChildProcessWithoutNullStreams): Promise<{}> {
@@ -79,34 +81,8 @@ export class TerminalService {
 
     @Process('terminal/mvn-install')
     async mvnInstall(cwd?: string) {
-        const options: SpawnOptionsWithoutStdio = cwd ? { cwd } : undefined
-        //const mvn = spawn(POWERSHELL.command, POWERSHELL.arguments, options);
-
-        /*const mvn = new Promise((resolve, reject) => {
-            exec('mvn --help', (error, stdout, stderr) => {
-                if (error) {
-                    reject(`stderr: ${error}`)
-                } else if (stdout) {
-                    resolve(stdout);
-                } else if (stderr) {
-                    reject(stderr);
-                }
-            });
-        });*/
-
-        /*const a = new Promise((resolve, reject) => {
-            let mvn = exec('mvn --help');
-
-            let result = 'stdout:';
-            mvn.stdout.on('data', data => { result += data });
-            mvn.stderr.on('data', data => reject(`stderr: ${data}`));
-            mvn.on('close', () => resolve(result));
-            mvn.stdin.end()
-            
-        });*/
-
-        let mvn = exec('mvn --help');
-
+        const options = cwd ? { cwd, maxBuffer: MAX_BUFFER } : undefined
+        let mvn = exec('mvn --help', options, );
 
         try {
             const result = await this.standardHandler(mvn);
