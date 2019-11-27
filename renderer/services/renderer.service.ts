@@ -1,6 +1,8 @@
+import { IpcRendererEvent } from 'electron';
+
 class Renderer {
 
-    channels: string[] = [];
+    private channels: string[] = [];
 
     on(channel: string, handler: Function) {
         global.ipcRenderer.on(channel, handler);
@@ -9,7 +11,7 @@ class Renderer {
 
     removeListener(channel: string, handler: Function) {
         global.ipcRenderer.removeListener(channel, handler);
-        this.channels.filter(sub => sub != channel)
+        this.channels = this.channels.filter(sub => sub != channel);
     }
 
     removeAll() {
@@ -20,8 +22,15 @@ class Renderer {
         this.channels = [];
     }
 
-    send(...args: any[]) {
-        global.ipcRenderer.send(...args);
+    send(channel: string, ...args: any[]) {
+        const result = new Promise((resolve) => {
+            global.ipcRenderer.once(
+                channel,
+                (_: IpcRendererEvent, message: any[]) => resolve(message));
+
+            global.ipcRenderer.send(channel, ...args);
+        });
+        return result;
     }
 }
 

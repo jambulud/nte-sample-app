@@ -46,17 +46,26 @@ export class TerminalService {
     @Process('terminal/rmdir')
     async rmdir(dirname: string) {
         const rmdir = spawn(CMD_RMDIR.command, [dirname]);
-        const result = await this.standardHandler(rmdir);
+        try {
+            const result = await this.standardHandler(rmdir);
+            return result;
 
-        return result;
+        } catch (error) {
+            return error;
+        }
     }
 
     @Process('terminal/pwd')
     async pwd() {
         const pwd = spawn(CMD_PWD.command, CMD_PWD.arguments);
-        const result = await this.standardHandler(pwd);
 
-        return result;
+        try {
+            const result = await this.standardHandler(pwd);
+            return result;
+
+        } catch (error) {
+            return error;
+        }
     }
 
     @Process('terminal/open-dialog')

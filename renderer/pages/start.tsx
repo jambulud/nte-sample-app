@@ -1,6 +1,7 @@
 import { Component, Fragment, ChangeEvent } from 'react'
 import { IpcRendererEvent } from 'electron';
 import Spawned from '../components/Spawned';
+import DialogRes from '../components/DialogRes';
 import Directory from '../components/Directory';
 import Renderer from '../services/renderer.service';
 import Layout from '../components/Layout';
@@ -13,6 +14,7 @@ class HelloElectron extends Component {
     rmdirMessage: null,
     lsMessage: null,
     pwdMessage: null,
+    dialog: [],
   }
 
   renderer: Renderer;
@@ -22,50 +24,29 @@ class HelloElectron extends Component {
     this.renderer = new Renderer();
   }
 
-  componentDidMount() {
-    // start listening the channel message
-    this.renderer.on('terminal/mkdir', this.handleMkdir)
-    this.renderer.on('terminal/rmdir', this.handleRmdir)
-    this.renderer.on('terminal/ls', this.handleLs);
-    this.renderer.on('terminal/pwd', this.handlePwd);
-  }
-
-  componentWillUnmount() {
-    // stop listening channel messages
-    this.renderer.removeAll();
-  }
-
-  handleMkdir = (_: IpcRendererEvent, message: string) => {
-    // receive a message from the main process and save it in the local state
-    this.setState({ mkdirMessage: message })
-  }
-
-  handleRmdir = (_: IpcRendererEvent, message: string) => {
-    this.setState({ rmdirMessage: message })
-  }
-
-  handleLs = (_: IpcRendererEvent, message: string) => {
+  handleSendLs = async () => {
+    const message = await this.renderer.send('terminal/ls')
     this.setState({ lsMessage: message })
   }
 
-  handlePwd = (_: IpcRendererEvent, message: string) => {
+  handleSendMkdir = async () => {
+    const message = await this.renderer.send('terminal/mkdir', this.state.input)
+    this.setState({ mkdirMessage: message })
+  }
+
+  handleSendPwd = async () => {
+    const message = await this.renderer.send('terminal/pwd');
     this.setState({ pwdMessage: message })
   }
 
-  handleSendLs = () => {
-    this.renderer.send('terminal/ls', this.state.input)
+  handleSendRmdir = async () => {
+    const message = await this.renderer.send('terminal/rmdir', this.state.rmdirInput)
+    this.setState({ rmdirMessage: message })
   }
 
-  handleSendMkdir = () => {
-    this.renderer.send('terminal/mkdir', this.state.input)
-  }
-
-  handleSendPwd = () => {
-    this.renderer.send('terminal/pwd', this.state.input)
-  }
-
-  handleSendRmdir = () => {
-    this.renderer.send('terminal/rmdir', this.state.rmdirInput)
+  handleSendOpenDialog = async () => {
+    const message = await this.renderer.send('terminal/open-dialog')
+    this.setState({ dialog: message['filePaths'] })
   }
 
   handleInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -91,6 +72,11 @@ class HelloElectron extends Component {
           command="pwd"
           handleInfo={this.handleSendPwd}>
         </Spawned>
+        <DialogRes
+          message={this.state.dialog}
+          command="open dialog"
+          handleInfo={this.handleSendOpenDialog}>
+        </DialogRes>
         <Directory
           message={this.state.mkdirMessage}
           command="mkdir"
