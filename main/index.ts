@@ -17,13 +17,17 @@ app.on('ready', async () => {
   await prepareNext('./renderer')
 
   const mainWindow = new BrowserWindow({
-    width: 800,
+    width: 1000,
     height: 600,
     webPreferences: {
       nodeIntegration: false,
       preload: join(__dirname, 'preload.js'),
     },
   })
+
+  if(isDev) {
+    mainWindow.webContents.openDevTools();
+  }
 
   const url = isDev
     ? 'http://localhost:8000/start'
@@ -44,3 +48,4 @@ terminalService.mkdir(null);
 terminalService.rmdir(null);
 terminalService.pwd();
 terminalService.openDialog();
+terminalService.mvnInstall();
