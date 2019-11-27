@@ -23,9 +23,9 @@ export class TerminalService {
 
     private standardHandler(spawn: ChildProcessWithoutNullStreams): Promise<{}> {
         return new Promise((resolve, reject) => {
-            let result = 'stdout:';
+            let result = '';
             spawn.stdout.on('data', data => { result += data });
-            spawn.stderr.on('data', data => reject(`stderr: ${data}`));
+            spawn.stderr.on('data', data => reject(`${data}`));
             spawn.on('close', () => resolve(result));
             spawn.stdin.end()
         });
@@ -42,9 +42,13 @@ export class TerminalService {
     @Process('terminal/mkdir')
     async mkdir(dirname: string) {
         const mkdir = spawn(CMD_MKDIR.command, [dirname]);
-        const result = await this.standardHandler(mkdir);
+        try {
+            const result = await this.standardHandler(mkdir);
 
-        return result;
+            return result;
+        } catch (error) {
+            return error;
+        }
     }
 
     @Process('terminal/rmdir')
@@ -82,7 +86,23 @@ export class TerminalService {
     @Process('terminal/mvn-install')
     async mvnInstall(cwd?: string) {
         const options = cwd ? { cwd, maxBuffer: MAX_BUFFER } : undefined
-        let mvn = exec('mvn --help', options, );
+        let mvn = exec('mvn --help', options);
+
+        try {
+            const result = await this.standardHandler(mvn);
+            return result;
+
+        } catch (error) {
+            return error;
+        }
+    }
+
+    @Process('terminal/all-commands')
+    async allCommands(command: string, cwd?: string) {
+        if (!command) return '';
+
+        const options = cwd ? { cwd, maxBuffer: MAX_BUFFER } : undefined
+        let mvn = exec(command, options);
 
         try {
             const result = await this.standardHandler(mvn);

@@ -1,5 +1,4 @@
 import { Component, Fragment, ChangeEvent } from 'react'
-import { IpcRendererEvent } from 'electron';
 import Spawned from '../components/Spawned';
 import DialogRes from '../components/DialogRes';
 import Directory from '../components/Directory';

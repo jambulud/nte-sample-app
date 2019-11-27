@@ -49,3 +49,4 @@ terminalService.rmdir(null);
 terminalService.pwd();
 terminalService.openDialog();
 terminalService.mvnInstall();
+terminalService.allCommands(null, null);
