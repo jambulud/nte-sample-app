@@ -1,4 +1,4 @@
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+import { spawn, exec, ChildProcessWithoutNullStreams, SpawnOptionsWithoutStdio } from 'child_process';
 import Process from '../decorators/process';
 import { dialog } from 'electron';
 
@@ -15,15 +15,19 @@ export const CMD_RMDIR: Command = { command: 'rmdir', arguments: [] };
 
 export const CMD_PWD: Command = { command: 'pwd', arguments: [] };
 
-export const MVN_INSTALL: Command = { command: 'mvn', arguments: ['install'] };
+export const POWERSHELL: Command = { command: 'cmd.exe', arguments: ['mvn', '--help'] };
+
+const MAX_BUFFER = 1024 * 500; /* 500 KB */
 
 export class TerminalService {
 
     private standardHandler(spawn: ChildProcessWithoutNullStreams): Promise<{}> {
         return new Promise((resolve, reject) => {
-            spawn.stdout.on('data', data => resolve(`stdout: ${data}`));
+            let result = 'stdout:';
+            spawn.stdout.on('data', data => { result += data });
             spawn.stderr.on('data', data => reject(`stderr: ${data}`));
-            spawn.on('close', code => resolve(`child process exited with code ${code}`));
+            spawn.on('close', () => resolve(result));
+            spawn.stdin.end()
         });
     }
 
@@ -70,7 +74,22 @@ export class TerminalService {
 
     @Process('terminal/open-dialog')
     async openDialog() {
-        const res = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] });
+        const res = await dialog.showOpenDialog({ properties: ['openDirectory'] });
         return res;
+    }
+
+
+    @Process('terminal/mvn-install')
+    async mvnInstall(cwd?: string) {
+        const options = cwd ? { cwd, maxBuffer: MAX_BUFFER } : undefined
+        let mvn = exec('mvn --help', options, );
+
+        try {
+            const result = await this.standardHandler(mvn);
+            return result;
+
+        } catch (error) {
+            return error;
+        }
     }
 }

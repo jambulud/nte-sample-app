@@ -12,6 +12,7 @@ class HelloElectron extends Component {
     rmdirInput: null,
     mkdirMessage: null,
     rmdirMessage: null,
+    mvnMessage: null,
     lsMessage: null,
     pwdMessage: null,
     dialog: [],
@@ -46,7 +47,14 @@ class HelloElectron extends Component {
 
   handleSendOpenDialog = async () => {
     const message = await this.renderer.send('terminal/open-dialog')
+    console.log(message)
     this.setState({ dialog: message['filePaths'] })
+  }
+
+  handleSendMvn = async() => {
+    const message = await this.renderer.send('terminal/mvn-install', this.state.dialog[0])
+    console.log(message)
+    this.setState({ mvnMessage: message})
   }
 
   handleInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -72,11 +80,6 @@ class HelloElectron extends Component {
           command="pwd"
           handleInfo={this.handleSendPwd}>
         </Spawned>
-        <DialogRes
-          message={this.state.dialog}
-          command="open dialog"
-          handleInfo={this.handleSendOpenDialog}>
-        </DialogRes>
         <Directory
           message={this.state.mkdirMessage}
           command="mkdir"
@@ -89,6 +92,16 @@ class HelloElectron extends Component {
           handleInfo={this.handleSendRmdir}
           handleInput={this.handleRmdirInput}>
         </Directory>
+        <DialogRes
+          message={this.state.dialog}
+          command="open dialog"
+          handleInfo={this.handleSendOpenDialog}>
+        </DialogRes>
+        <Spawned
+          message={this.state.mvnMessage}
+          command="mvn --help"
+          handleInfo={this.handleSendMvn}>
+        </Spawned>
       </Layout>
     );
   }
