@@ -43,3 +43,4 @@ terminalService.ls();
 terminalService.mkdir(null);
 terminalService.rmdir(null);
 terminalService.pwd();
+terminalService.openDialog();

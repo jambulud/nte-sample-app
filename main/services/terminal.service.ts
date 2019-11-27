@@ -1,6 +1,6 @@
-import { WebContents } from 'electron';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import Process from '../decorators/process';
+import { dialog } from 'electron';
 
 interface Command {
     command: string,
@@ -14,6 +14,8 @@ export const CMD_MKDIR: Command = { command: 'mkdir', arguments: [] };
 export const CMD_RMDIR: Command = { command: 'rmdir', arguments: [] };
 
 export const CMD_PWD: Command = { command: 'pwd', arguments: [] };
+
+export const MVN_INSTALL: Command = { command: 'mvn', arguments: ['install'] };
 
 export class TerminalService {
 
@@ -55,5 +57,11 @@ export class TerminalService {
         const result = await this.standardHandler(pwd);
 
         return result;
+    }
+
+    @Process('terminal/open-dialog')
+    async openDialog() {
+        const res = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] });
+        return res;
     }
 }

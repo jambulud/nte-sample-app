@@ -3,22 +3,22 @@ import { Component, MouseEvent, Fragment } from 'react'
 
 interface CustomProps {
     handleInfo: (event: MouseEvent) => void,
-    message: string,
+    message: string[],
     command: string,
 }
 
-class Spawned extends Component<CustomProps>{
+class DialogRes extends Component<CustomProps>{
 
     constructor(props: CustomProps) {
         super(props);
     }
 
     directoryInfo() {
-        if (this.props.message) {
+        if (this.props.message.length > 0) {
             return (
                 <Fragment>
-                    <h3>Directory info:</h3>
-                    <pre>{this.props.message}</pre>
+                    <h3>Selected files:</h3>
+                    {this.props.message.map(item => <p>{item}</p>)}
                 </Fragment>
             )
         }
@@ -52,4 +52,4 @@ class Spawned extends Component<CustomProps>{
     }
 }
 
-export default Spawned;
+export default DialogRes;
