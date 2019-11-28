@@ -22,7 +22,7 @@ class Renderer {
         this.channels = [];
     }
 
-    send(channel: string, ...args: any[]) {
+    send(channel: string, ...args: any[]): Promise<{ error?: string }> {
         const result = new Promise((resolve) => {
             global.ipcRenderer.once(
                 channel,

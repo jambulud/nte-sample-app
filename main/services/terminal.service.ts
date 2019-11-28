@@ -109,7 +109,7 @@ export class TerminalService {
             return result;
 
         } catch (error) {
-            return error;
+            return { error };
         }
     }
 }
