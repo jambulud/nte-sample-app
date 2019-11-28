@@ -54,9 +54,9 @@ export default class About extends Component {
       let cwd = cwdClean;
       let message: { error?: string } | string = response;
       if (!response.error) {
-        if (this.state.input.startsWith('cd ')) {
-          cwd = inputClean.replace('cd ', '');
-          const resp = await this.renderer.send('terminal/all-commands', 'cd', cwd);
+        if (inputClean.startsWith('cd ')) {
+          /*cwd = inputClean.replace('cd ', '').trim();*/
+          const resp = await this.renderer.send('terminal/all-commands', `${inputClean} && cd`, cwd);
           cwd = resp.toString().trim();
         }
       } else {
@@ -70,7 +70,6 @@ export default class About extends Component {
         const previous = [...prevState.previous, previousCmd];
         return { previous, input: '', cwd };
       });
-
     }
   };
 
