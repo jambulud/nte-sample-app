@@ -1,6 +1,6 @@
 import Renderer from './renderer.service';
 
-export class messageSenderService {
+export class MessageSenderService {
 
     renderer: Renderer;
     constructor() {

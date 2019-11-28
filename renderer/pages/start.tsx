@@ -2,7 +2,7 @@ import { Component, Fragment, ChangeEvent } from 'react'
 import Spawned from '../components/Spawned';
 import DialogRes from '../components/DialogRes';
 import Directory from '../components/Directory';
-import Renderer from '../services/renderer.service';
+import { MessageSenderService } from '../services/messageSender.service';
 import Layout from '../components/Layout';
 
 class HelloElectron extends Component {
@@ -17,43 +17,41 @@ class HelloElectron extends Component {
     dialog: [],
   }
 
-  renderer: Renderer;
+  messageSender: MessageSenderService;
 
   constructor(props: {}) {
     super(props);
-    this.renderer = new Renderer();
+    this.messageSender = new MessageSenderService();
   }
 
   handleSendLs = async () => {
-    const message = await this.renderer.send('terminal/ls')
+    const message = await this.messageSender.sendLs();
     this.setState({ lsMessage: message })
   }
 
   handleSendMkdir = async () => {
-    const message = await this.renderer.send('terminal/mkdir', this.state.input)
+    const message = await this.messageSender.sendMkdir(this.state.input);
     this.setState({ mkdirMessage: message })
   }
 
   handleSendPwd = async () => {
-    const message = await this.renderer.send('terminal/pwd');
+    const message = await this.messageSender.sendPwd();
     this.setState({ pwdMessage: message })
   }
 
   handleSendRmdir = async () => {
-    const message = await this.renderer.send('terminal/rmdir', this.state.rmdirInput)
+    const message = await this.messageSender.sendRmdir(this.state.rmdirInput);
     this.setState({ rmdirMessage: message })
   }
 
   handleSendOpenDialog = async () => {
-    const message = await this.renderer.send('terminal/open-dialog')
-    console.log(message)
+    const message = await this.messageSender.sendOpenDialog();
     this.setState({ dialog: message['filePaths'] })
   }
 
-  handleSendMvn = async() => {
-    const message = await this.renderer.send('terminal/mvn-install', this.state.dialog[0])
-    console.log(message)
-    this.setState({ mvnMessage: message})
+  handleSendMvn = async () => {
+    const message = await this.messageSender.sendMvnHelp(this.state.dialog[0]);
+    this.setState({ mvnMessage: message })
   }
 
   handleInput = (event: ChangeEvent<HTMLInputElement>) => {

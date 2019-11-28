@@ -56,6 +56,8 @@ export default class About extends Component {
       if (!response.error) {
         if (this.state.input.startsWith('cd ')) {
           cwd = inputClean.replace('cd ', '');
+          const resp = await this.renderer.send('terminal/all-commands', 'cd', cwd);
+          cwd = resp.toString().trim();
         }
       } else {
         message = response.error;
