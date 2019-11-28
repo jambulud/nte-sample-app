@@ -50,12 +50,12 @@ export default class About extends Component {
       const inputClean = this.state.input.trim();
       const cwdClean = this.state.cwd.trim();
       const response = await this.renderer.send('terminal/all-commands', inputClean, cwdClean);
+      console.log(response)
 
       let cwd = cwdClean;
       let message: { error?: string } | string = response;
       if (!response.error) {
         if (inputClean.startsWith('cd ')) {
-          /*cwd = inputClean.replace('cd ', '').trim();*/
           const resp = await this.renderer.send('terminal/all-commands', `${inputClean} && cd`, cwd);
           cwd = resp.toString().trim();
         }

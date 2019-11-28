@@ -24,9 +24,16 @@ export class TerminalService {
     private standardHandler(spawn: ChildProcessWithoutNullStreams): Promise<{}> {
         return new Promise((resolve, reject) => {
             let result = '';
+            let error = ''
             spawn.stdout.on('data', data => { result += data });
-            spawn.stderr.on('data', data => reject(`${data}`));
-            spawn.on('close', () => resolve(result));
+            spawn.stderr.on('data', data => { error += data});
+            spawn.on('close', () => {
+                if(error) {
+                    reject(result + error)
+                }else {
+                    resolve(result + error)
+                }
+            });
             spawn.stdin.end()
         });
     }
