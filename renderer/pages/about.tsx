@@ -1,11 +1,11 @@
-import { Component, KeyboardEvent, ChangeEvent, createRef, RefObject } from 'react'
+import { Component, KeyboardEvent, ChangeEvent, createRef, RefObject, Fragment } from 'react'
 import Layout from '../components/Layout';
 import Renderer from '../services/renderer.service';
 
 type KeyboardTarget = KeyboardEvent<HTMLInputElement> & { target: { value: string } };
 
 export interface AboutState {
-  previous: Array<string>;
+  previous: Array<{ cwd: string, cmd: string }>;
   input: string;
   cwd: string;
 }
@@ -64,8 +64,10 @@ export default class About extends Component {
       }
 
       this.setState((prevState: Readonly<AboutState>) => {
-        const executedCmd = `${prevState.cwd}\n\$ ${prevState.input}\n${message}`;
-        const previous = [...prevState.previous, executedCmd];
+        const executedInCwd = `${prevState.cwd}`;
+        const executedCmd = `\$ ${prevState.input}\n${message}`;
+        const previousCmd = { cwd: executedInCwd, cmd: executedCmd };
+        const previous = [...prevState.previous, previousCmd];
         return { previous, input: '', cwd };
       });
 
@@ -76,6 +78,34 @@ export default class About extends Component {
     this.textInput.current.focus();
   }
 
+  displayCommand = (cwd: string, cmd: string) => {
+    return (
+      <Fragment>
+        <pre className="terminal__path mb-0 color--green">{cwd}</pre>
+        <pre className="terminal__command mt-0">{cmd}</pre>
+        <style jsx>{`
+          .terminal__command, .terminal__path {
+            width: 100%;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+          }
+          .color--green {
+            color: #00FF66
+          }
+
+          .mb-0 {
+            margin-bottom: 0;
+          }
+
+          .mt-0 {
+            margin-top: 0;
+          }
+        `}
+        </style>
+      </Fragment>
+    )
+  }
+
 
   render() {
     return (
@@ -84,9 +114,10 @@ export default class About extends Component {
         <div className="terminal" onClick={this.focusTextInput}>
           <div className="terminal__previous">
             <pre>Hello this is a terminal</pre>
-            {this.state.previous.map(prevCommand => <pre className="terminal__command">{prevCommand}</pre>)}
+            {this.state.previous.map(prevCmd => this.displayCommand(prevCmd.cwd, prevCmd.cmd))}
           </div>
-          <span className="font--console">{this.state.cwd}</span>$ <input
+          <span className="font--console color--green">{this.state.cwd}</span><br />
+          $ <input
             ref={this.textInput}
             value={this.state.input}
             className="terminal__input font--console"
@@ -116,24 +147,34 @@ export default class About extends Component {
             border: none;
             caret-color: white;
             color: inherit;
+            width: calc(100% - 1rem);
           }
 
           .terminal__input:focus {
             outline-width: 0;
           }
 
-          .terminal__command {
+          .terminal__command, .terminal__path {
             width: 100%;
             overflow-wrap: break-word;
             white-space: pre-wrap;
+          }
+
+          .terminal__path {
+            color: #00FF66
           }
 
           .font--console {
             font-family: monospace,monospace;
             font-size:0.8125rem;
           }
+
+          .color--green {
+            color: #00FF66
+          }
         `}
         </style>
+        
       </Layout>
     );
   };
