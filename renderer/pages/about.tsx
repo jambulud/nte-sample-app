@@ -20,11 +20,13 @@ export default class About extends Component {
 
   renderer: Renderer;
   textInput: RefObject<HTMLInputElement>;
+  scrollAnchor: RefObject<HTMLInputElement>;
 
   constructor(props: {}) {
     super(props);
     this.renderer = new Renderer();
     this.textInput = createRef();
+    this.scrollAnchor = createRef();
   }
 
   componentDidMount() {
@@ -68,12 +70,16 @@ export default class About extends Component {
         const previousCmd = { cwd: executedInCwd, cmd: executedCmd };
         const previous = [...prevState.previous, previousCmd];
         return { previous, input: '', cwd };
-      });
+      }, this.scrollToBottom);
     }
   };
 
   focusTextInput = () => {
     this.textInput.current.focus();
+  }
+
+  scrollToBottom = () => {
+    this.scrollAnchor.current.scrollIntoView({ behavior: 'smooth' });
   }
 
   displayCommand = (cwd: string, cmd: string) => {
@@ -122,6 +128,7 @@ export default class About extends Component {
             placeholder="write your command"
             onChange={this.handleChange}
             onKeyDown={this.handleSendCommand} />
+          <div ref={this.scrollAnchor}></div>
         </div>
         <style jsx>{`
           h1 {
@@ -172,7 +179,7 @@ export default class About extends Component {
           }
         `}
         </style>
-        
+
       </Layout>
     );
   };
